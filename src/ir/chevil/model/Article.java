@@ -7,12 +7,14 @@ public class Article {
     private String title;
     private String content;
     private Category category;
+    private ArticleStatus status;
 
     public Article(int id, String title, String content, Category category) {
         this.setId(id);
         this.setTitle(title);
         this.setContent(content);
         this.setCategory(category);
+        this.setStatus(ArticleStatus.DRAFT);
     }
 
     public Article(int id, String title, String content) {
@@ -49,6 +51,14 @@ public class Article {
 
     public void setCategory(Category category) {
         this.category = category;
+    }
+
+    public ArticleStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ArticleStatus status) {
+        this.status = status;
     }
 
     @Override
