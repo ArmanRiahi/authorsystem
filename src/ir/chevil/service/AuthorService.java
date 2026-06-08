@@ -1,14 +1,16 @@
 package ir.chevil.service;
 
 import ir.chevil.exception.ArticleNotFoundException;
+import ir.chevil.exception.DuplicatedArticleException;
 import ir.chevil.exception.InvalidUsernameException;
 import ir.chevil.exception.WeakPasswordException;
 import ir.chevil.model.Article;
-import ir.chevil.model.ArticleStatus;
-import ir.chevil.model.Author;
+import ir.chevil.enums.ArticleStatus;
+import ir.chevil.model.user.Author;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class AuthorService {
     private List<Author> authors;
@@ -30,16 +32,22 @@ public class AuthorService {
     }
 
     public Author findAuthorById(int authorId) {
-        for (Author author : authors) {
-            if (author.getId() == authorId) return author;
-        }
-
-        return null;
+        return authors.stream()
+                .filter(author -> author.getId() == authorId)
+                .findFirst()
+                .orElse(null);
     }
 
-    public void registerArticleForAuthor(int authorId, Article article) {
+    public void registerArticleForAuthor(int authorId, Article article) throws DuplicatedArticleException {
         Author author = findAuthorById(authorId);
         if (author != null) {
+            boolean exists = author.getArticles().stream()
+                            .anyMatch(x -> x.getId() == article.getId());
+
+            if (exists) {
+                throw new DuplicatedArticleException("Error: An article with the ID " + article.getId() + " has already been registered for this author!");
+            }
+
             author.addArticle(article);
             IO.println("The article was registered as a default (DRAFT) for the author.");
         } else {
@@ -58,36 +66,31 @@ public class AuthorService {
             throw new ArticleNotFoundException("Author not founded.");
         }
 
-        for (Article article : author.getArticles()) {
-            if (article.getId() == articleId) return article;
-        }
-        throw new ArticleNotFoundException("Error: No article with ID " + articleId + " was found for this author.");
+        return author.getArticles().stream()
+                .filter(article -> article.getId() == articleId)
+                .findFirst()
+                .orElseThrow(() -> new ArticleNotFoundException("Error: No article with ID " + articleId + " was found for this author."));
     }
 
     public void showPublishedArticle() {
         IO.println("--- List of all published articles ---");
-        boolean hasPublished = false;
-        for (Author author : authors) {
-            for (Article article : author.getArticles()) {
-                if (article.getStatus() == ArticleStatus.PUBLISHED) {
-                    IO.println(
-                            "Author: " + author.getFirstName() + " " + author.getLastName() +
-                                    " -> " + article
-                    );
-                    hasPublished = true;
-                }
-            }
-        }
-
-        if (!hasPublished) {
-            System.err.println("There are no published article.");
+        long count = authors.stream()
+                .flatMap(author -> author.getArticles().stream()
+                        .filter(article -> article.getStatus() == ArticleStatus.PUBLISHED)
+                        .map(article -> "Author: " + author.getFirstName() +
+                                " " + author.getLastName() +
+                                " -> " + article))
+                .peek(IO::println)
+                .count();
+        if (count == 0) {
+            IO.println("There are no published article.");
         }
     }
 
     public void showArticlesByAuthorId(int authorId) {
         Author author = findAuthorById(authorId);
         if (author != null) {
-            List<Article> articles = author.getArticles();
+            Set<Article> articles = author.getArticles();
             if (articles.isEmpty()) IO.println("The author don't have any articles!");
             else {
                 IO.println(

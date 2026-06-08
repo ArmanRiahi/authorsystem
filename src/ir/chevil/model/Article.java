@@ -1,5 +1,7 @@
 package ir.chevil.model;
 
+import ir.chevil.enums.ArticleStatus;
+
 import java.util.Objects;
 
 public class Article {
