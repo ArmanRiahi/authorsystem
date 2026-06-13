@@ -1,22 +1,16 @@
 package ir.chevil.model;
 
-import java.util.Objects;
+import ir.chevil.model.base.BaseModel;
 
-public class Category {
-    private int id;
+import java.util.Objects;
+import java.util.UUID;
+
+public class Category extends BaseModel<UUID> {
     private String title;
 
     public Category(int id, String title) {
-        this.setId(id);
+        this.setId(UUID.randomUUID());
         this.setTitle(title);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getTitle() {
@@ -29,7 +23,7 @@ public class Category {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(id);
+        return Objects.hashCode(this.getId());
     }
 
     @Override
@@ -37,13 +31,13 @@ public class Category {
         if (obj == this) return true;
         if (obj == null || obj.getClass() != getClass()) return false;
         Category category = (Category) obj;
-        return Objects.equals(id, category.id);
+        return Objects.equals(this.getId(), category.getId());
     }
 
     @Override
     public String toString() {
         return "Category{" +
-                "id=" + id +
+                "id=" + this.getId() +
                 ",title=" + title +
                 "}";
     }

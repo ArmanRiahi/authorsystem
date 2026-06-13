@@ -11,13 +11,12 @@ public class Author extends User {
     private Set<Article> articles;
 
     public Author(
-            int id,
-            String lastName,
             String firstName,
+            String lastName,
             String username,
             String password
     ) {
-        super(id, firstName, lastName, username, password);
+        super(firstName, lastName, username, password);
         this.setArticles(new HashSet<>());
     }
 

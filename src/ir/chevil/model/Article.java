@@ -1,34 +1,27 @@
 package ir.chevil.model;
 
 import ir.chevil.enums.ArticleStatus;
+import ir.chevil.model.base.BaseModel;
 
 import java.util.Objects;
+import java.util.UUID;
 
-public class Article {
-    private int id;
+public class Article extends BaseModel<UUID> {
     private String title;
     private String content;
     private Category category;
     private ArticleStatus status;
 
-    public Article(int id, String title, String content, Category category) {
-        this.setId(id);
+    public Article(String title, String content, Category category) {
+        this.setId(UUID.randomUUID());
         this.setTitle(title);
         this.setContent(content);
         this.setCategory(category);
         this.setStatus(ArticleStatus.DRAFT);
     }
 
-    public Article(int id, String title, String content) {
-        this(id, title, content, null);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
+    public Article(String title, String content) {
+        this(title, content, null);
     }
 
     public String getTitle() {
@@ -65,7 +58,7 @@ public class Article {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(id);
+        return Objects.hashCode(this.getId());
     }
 
     @Override
@@ -73,13 +66,13 @@ public class Article {
         if (obj == this) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
         Article article = (Article) obj;
-        return Objects.equals(id, article.id);
+        return Objects.equals(this.getId(), article.getId());
     }
 
     @Override
     public String toString() {
         return "Article{" +
-                "id=" + id +
+                "id=" + this.getId() +
                 ",title=" + title +
                 ",content=" + content +
                 ",category=" + (category != null ? category.getTitle() : "No Category") +
